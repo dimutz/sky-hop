@@ -18,22 +18,6 @@ def game_over_screen(screen):
 	pygame.time.wait(2000)  # Așteaptă 2 secunde înainte de ieșire
 	return False  # Închide jocul
 
-
-"""def check_platform_collision(character, platforms):
-	for platform in platforms:
-		if (
-				character.velocity_y > 0 and  # Verifică dacă personajul cade
-				character.y + character.height >= platform.rect.top and
-				character.y + character.height <= platform.rect.bottom and
-				character.x + character.width >= platform.rect.left and
-				character.x <= platform.rect.right
-		):
-			# print(f"Collision detected with platform at {platform.rect.topleft}")
-			character.velocity_y = character.jump_force  # Resetează săritura
-			return True
-	return False
-"""
-
 def game_loop(screen, clock):
 	running = True
 
@@ -59,21 +43,16 @@ def game_loop(screen, clock):
 		character.handle_movement(keys)
 
 		# Actualizează poziția personajului
-		character.status = character.update(platforms, HEIGHT, 1)
-		if character.status == "game over":
+		character_status = character.update(platforms, HEIGHT, 1)
+		if character_status == "game over":
 			running = False
 
-		# Verifică coliziunea cu platformele
-		#on_platform = check_platform_collision(character, platforms)
-
 		# Test pentru Game Over
-		"""if character_status == "game_over" and not on_platform:
-			print("Game Over triggered!")
+		if character_status == "game_over":
 			running = False
 			# Dacă utilizatorul decide să iasă din joc
 			if not game_over_screen(screen):
 				break
-		"""
 
 		# Actualizează platformele
 		platforms = update_platforms(platforms, 1, WIDTH, HEIGHT)
