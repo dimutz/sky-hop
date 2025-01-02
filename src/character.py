@@ -3,7 +3,7 @@ import pygame
 
 class Character:
 	def __init__(self, screen_width, screen_height):
-		self.image = pygame.image.load("character.png")
+		self.image = pygame.image.load("features/character.png")
 		self.image = pygame.transform.smoothscale(self.image, (100, 100))
 
 		self.width, self.height = self.image.get_size()
