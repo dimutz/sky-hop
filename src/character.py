@@ -21,10 +21,14 @@ class Character:
             self.x -= self.speed_x
         if keys[pygame.K_RIGHT]:
             self.x += self.speed_x
+        if keys[pygame.K_SPACE] and self.y == self.initial_y:
+            self.velocity_y = self.jump_force
 
         self.x = max(0, min(self.x, self.screen_width - self.width))
 
-    def update(self):
+
+
+    def update(self, screen_height):
         self.y += self.velocity_y
         self.velocity_y += self.gravity
         self.velocity_y = min(self.velocity_y, 5)
@@ -32,6 +36,11 @@ class Character:
         if self.y >= self.initial_y:
             self.y = self.initial_y
             self.velocity_y = self.jump_force
+
+        if self.y + self.height >= screen_height:
+            return "game_over"
+
+        return "ok"
 
     def draw(self, screen):
         screen.blit(self.image, (self.x, self.y))

@@ -1,45 +1,74 @@
 import pygame
-from game_platform import generate_initial_platforms, update_platforms
+from game_platform import generate_initial_platforms, update_platforms, create_initial_platform
 from character import Character  # Clasa pentru personaj
 
 WIDTH, HEIGHT = 500, 500
 BLUE = (0, 0, 255)
 FPS = 60
 
+def game_over_screen(screen):
+    font = pygame.font.SysFont("Arial", 48, bold=True)
+    text = font.render("GAME OVER", True, (255, 0, 0))
+    screen.fill((0, 0, 0))
+    screen.blit(text, (WIDTH // 2 - text.get_width() // 2, HEIGHT // 3))
+
+    pygame.display.flip()
+
+    pygame.time.wait(2000)  # Așteaptă 2 secunde înainte de ieșire
+    return False  # Închide jocul
+
+
+def check_platform_collision(character, platforms):
+    for platform in platforms:
+        if (
+            character.velocity_y > 0 and  # Verifică dacă personajul cade
+            character.y + character.height >= platform.rect.top and
+            character.y + character.height <= platform.rect.bottom and
+            character.x + character.width >= platform.rect.left and
+            character.x <= platform.rect.right
+        ):
+            print(f"Collision detected with platform at {platform.rect.topleft}")
+            character.velocity_y = character.jump_force  # Resetează săritura
+            return True
+    return False
+
 def game_loop(screen, clock):
     running = True
 
-    # Creează personajul
-    character = Character(WIDTH, HEIGHT)
+    # Creează platforma inițială
+    initial_platform = create_initial_platform(WIDTH, HEIGHT)
 
-    # Creează platformele
-    platforms = generate_initial_platforms(6, WIDTH, HEIGHT)
+    # Creează personajul și poziționează-l pe platforma inițială
+    character = Character(WIDTH, HEIGHT)
+    character.y = initial_platform.rect.top - character.height  # Poziționează deasupra platformei
+
+    # Creează restul platformelor
+    platforms = generate_initial_platforms(5, WIDTH, HEIGHT)
+    platforms.append(initial_platform)  # Adaugă platforma inițială în lista de platforme
 
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
 
-        # Obține tastele apăsate
         keys = pygame.key.get_pressed()
-
-        # Mișcă și actualizează personajul
         character.handle_movement(keys)
-        character.update()
+
+        # Actualizează poziția personajului
+        character_status = character.update(HEIGHT)
+
+        # Verifică coliziunea cu platformele
+        on_platform = check_platform_collision(character, platforms)
+
+        # Test pentru Game Over
+        if character_status == "game_over" and not on_platform:
+            print("Game Over triggered!")
+            running = False
+            if not game_over_screen(screen):  # Dacă utilizatorul decide să iasă din joc
+                break
 
         # Actualizează platformele
-        platforms = update_platforms(platforms, 2, WIDTH, HEIGHT)
-
-        # Verifică coliziunile cu platformele
-        for platform in platforms:
-            if (
-                character.y + character.height >= platform.rect.y
-                and character.y + character.height <= platform.rect.y + 10
-                and character.x + character.width >= platform.rect.x
-                and character.x <= platform.rect.x + platform.rect.width
-                and character.velocity_y > 0
-            ):
-                character.velocity_y = character.jump_force
+        platforms = update_platforms(platforms, 1, WIDTH, HEIGHT)
 
         # Fundal
         screen.fill(BLUE)
@@ -49,7 +78,6 @@ def game_loop(screen, clock):
             platform.draw(screen)
         character.draw(screen)
 
-        # Actualizează afișajul
         pygame.display.flip()
         clock.tick(FPS)
 

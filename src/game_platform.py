@@ -15,6 +15,13 @@ class Platform:
     def draw(self, screen):
         screen.blit(self.image, self.rect)
 
+def create_initial_platform(screen_width, screen_height):
+    platform_width = 100
+    platform_height = 10
+    x = screen_width // 2 - PLATFORM_WIDTH // 2
+    y = screen_height - PLATFORM_HEIGHT
+    return Platform(x, y, )
+
 def generate_initial_platforms(num_platforms, screen_width, screen_height):
     platforms = []
     spacing = screen_height // num_platforms
