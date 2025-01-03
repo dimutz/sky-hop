@@ -134,7 +134,7 @@ def game_loop(screen, clock):
 
 		# Update character position and check game over status
 		character_status = character.update(platforms, HEIGHT, 1)
-		# Crește scorul dacă s-a atins o platformă
+		# Updates the score if the character collides with a platform
 		if character.check_collision_with_platform(platforms):
 			score += 1
 
@@ -155,7 +155,6 @@ def game_loop(screen, clock):
 		platforms = update_platforms(platforms, 1, GAME_WIDTH, HEIGHT)
 
 		# Draw everything on the screen
-
 		for platform in platforms:
 			platform.draw(screen)
 		character.draw(screen)
