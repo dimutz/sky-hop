@@ -162,7 +162,7 @@ def game_loop(screen, clock):
 				exit()
 
 		# Update platform positions
-		platforms = update_platforms(platforms, 1, GAME_WIDTH, HEIGHT)
+		platforms = update_platforms(platforms, 0, GAME_WIDTH, HEIGHT)
 
     
 		# Generate new rewards
