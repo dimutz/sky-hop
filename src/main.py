@@ -1,7 +1,9 @@
 import pygame
+import random
 from game_platform import generate_initial_platforms, update_platforms, create_initial_platform
 from character import Character  # Character class
 from reward import generate_rewards
+
 
 WIDTH, HEIGHT = 700, 500
 BUTTON_WIDTH, BUTTON_HEIGHT = 200, 50
@@ -106,9 +108,9 @@ def game_loop(screen, clock):
 	platforms = generate_initial_platforms(5, GAME_WIDTH, HEIGHT)
 	platforms.append(initial_platform)
 
-	# Generate rewards
-	rewards = generate_rewards(platforms, 10)
-	score = 0
+	# Inițializarea listei de recompense
+	rewards = []
+
 	while running:
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
@@ -116,9 +118,10 @@ def game_loop(screen, clock):
 				pygame.quit()
 				exit()
 
+
 		# Clear the game screen
-		screen.fill(PINK, (0, 0, GAME_WIDTH, HEIGHT))  # Game area
-		screen.fill(BLACK, (GAME_WIDTH, 0, MENU_WIDTH, HEIGHT))  # Menu area
+		screen.fill(PINK, (0, 0, GAME_WIDTH, HEIGHT))
+		screen.fill(BLACK, (GAME_WIDTH, 0, MENU_WIDTH, HEIGHT))
 
 		# Draw menu
 		font = pygame.font.Font("features/PixelOperator-Bold.ttf", 35)
@@ -138,6 +141,7 @@ def game_loop(screen, clock):
 
 		# Update character position and check game over status
 		character_status = character.update(platforms, HEIGHT, 1)
+
 		# Increase score when touching a platform
 		if character.check_collision_with_platform(platforms):
 			score += 1
@@ -157,6 +161,10 @@ def game_loop(screen, clock):
 
 		# Update platform positions
 		platforms = update_platforms(platforms, 1, GAME_WIDTH, HEIGHT)
+
+		# Generate new rewards
+		if random.random() < 0.005:
+			generate_rewards(platforms, rewards)
 
 		# Update rewards and remove those out of screen
 		for reward in rewards:

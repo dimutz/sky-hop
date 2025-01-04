@@ -30,12 +30,28 @@ class Reward:
 		# Check if reward is out of screen
 		return self.y + self.height >= screen_height
 
-def generate_rewards(platforms, num_rewards):
-	rewards = []
-	selected_platforms = random.sample(platforms, min(num_rewards, len(platforms)))
+def generate_rewards(platforms, rewards, min_distance=200, max_attempts=5):
+	for platform in platforms:
+		valid_position = False
+		attempts = 0
+		while not valid_position and attempts < max_attempts:
+			x = platform.rect.x + random.randint(0, platform.rect.width - 50)
+			y = platform.rect.y - 50  # Reward's vertical position
 
-	for platform in selected_platforms:
-		reward = Reward(platform)
-		rewards.append(reward)
+			# Check distance between rewards
+			valid_position = True
+			for reward in rewards:
+				if abs(reward.x - x) < min_distance and abs(reward.y - y) < min_distance:
+					valid_position = False
+					break
+
+			attempts += 1  # Increase attempts
+
+		# If `max_attempts` can not find valid position, stop
+		if valid_position:
+			reward = Reward(platform)
+			reward.x = x
+			reward.y = y
+			rewards.append(reward)
 
 	return rewards
