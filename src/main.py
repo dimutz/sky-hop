@@ -1,6 +1,7 @@
 import pygame
 from game_platform import generate_initial_platforms, update_platforms, create_initial_platform
 from character import Character  # Character class
+from game_menu import GameMenu
 
 WIDTH, HEIGHT = 700, 500
 BUTTON_WIDTH, BUTTON_HEIGHT = 200, 50
@@ -134,7 +135,7 @@ def game_loop(screen, clock):
 
 		# Update character position and check game over status
 		character_status = character.update(platforms, HEIGHT, 1)
-		# Updates the score if the character collides with a platform
+		# Crește scorul dacă s-a atins o platformă
 		if character.check_collision_with_platform(platforms):
 			score += 1
 
@@ -170,11 +171,23 @@ def main():
 	pygame.display.set_caption("Sky Hop")
 	clock = pygame.time.Clock()
 
-	# Run the game loop
-	game_loop(screen, clock)
+	font = pygame.font.Font("features/PixelOperator-Bold.ttf", 35)
+	menu = GameMenu(screen, font, WIDTH, HEIGHT)
 
-	# Quit the game
-	pygame.quit()
+	while True:
+		menu_action = menu.main_menu()
+
+		if menu_action == "quit":
+			pygame.quit()
+			exit()
+		elif menu_action == "start":
+			game_loop(screen, clock)
+
+		# Run the game loop
+		game_loop(screen, clock)
+
+		# Quit the game
+		pygame.quit()
 
 # Entry point of the script
 if __name__ == "__main__":
