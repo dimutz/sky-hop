@@ -2,6 +2,8 @@ import pygame
 import random
 from game_platform import generate_initial_platforms, update_platforms, create_initial_platform
 from character import Character  # Character class
+from game_menu import GameMenu
+
 from reward import generate_rewards
 
 
@@ -162,6 +164,7 @@ def game_loop(screen, clock):
 		# Update platform positions
 		platforms = update_platforms(platforms, 1, GAME_WIDTH, HEIGHT)
 
+    
 		# Generate new rewards
 		if random.random() < 0.005:
 			generate_rewards(platforms, rewards)
@@ -201,11 +204,23 @@ def main():
 	pygame.display.set_caption("Sky Hop")
 	clock = pygame.time.Clock()
 
-	# Run the game loop
-	game_loop(screen, clock)
+	font = pygame.font.Font("features/PixelOperator-Bold.ttf", 35)
+	menu = GameMenu(screen, font, WIDTH, HEIGHT)
 
-	# Quit the game
-	pygame.quit()
+	while True:
+		menu_action = menu.main_menu()
+
+		if menu_action == "quit":
+			pygame.quit()
+			exit()
+		elif menu_action == "start":
+			game_loop(screen, clock)
+
+		# Run the game loop
+		game_loop(screen, clock)
+
+		# Quit the game
+		pygame.quit()
 
 # Entry point of the script
 if __name__ == "__main__":
