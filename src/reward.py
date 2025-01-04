@@ -1,10 +1,11 @@
 import pygame
 import random
+reward1 = "features/acorn.png"
 
 height = 500
 class Reward:
 	def __init__(self, platform):
-		self.image = pygame.image.load("features/reward1.png")
+		self.image = pygame.image.load(reward1)
 		self.image = pygame.transform.smoothscale(self.image, (50, 50))
 		self.width, self.height = self.image.get_size()
 		self.platform = platform

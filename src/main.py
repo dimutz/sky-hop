@@ -3,20 +3,18 @@ import random
 from game_platform import generate_initial_platforms, update_platforms, create_initial_platform
 from character import Character  # Character class
 from game_menu import GameMenu
-
 from reward import generate_rewards
 
 
-WIDTH, HEIGHT = 700, 500
+WIDTH, HEIGHT = 500, 600
 BUTTON_WIDTH, BUTTON_HEIGHT = 200, 50
-GAME_WIDTH = 500
-MENU_WIDTH = 200
 RED = (255, 182, 193)
 YELLOW = (255, 255, 0)
 BLUE = (0, 0, 255)
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 PINK = (234, 212, 252)
+DARK_PINK = (180, 90, 180)
 GREEN = (152, 251, 152)
 FPS = 60
 
@@ -100,15 +98,18 @@ def game_loop(screen, clock):
 	best_score = read_best_score()
 
 	# Create the initial platform
-	initial_platform = create_initial_platform(GAME_WIDTH, HEIGHT)
+	initial_platform = create_initial_platform(WIDTH, HEIGHT)
+	platforms = [initial_platform]
 
 	# Create the character and position it on the initial platform
-	character = Character(GAME_WIDTH, HEIGHT)
+	character = Character(WIDTH, HEIGHT)
 	character.y = initial_platform.rect.top - character.height
 
 	# Generate additional platforms
-	platforms = generate_initial_platforms(5, GAME_WIDTH, HEIGHT)
-	platforms.append(initial_platform)
+	platforms = generate_initial_platforms(platforms, 5, WIDTH, HEIGHT)
+
+	# Inițializarea listei de recompense
+	rewards = []
 
 	# Inițializarea listei de recompense
 	rewards = []
@@ -122,20 +123,17 @@ def game_loop(screen, clock):
 
 
 		# Clear the game screen
-		screen.fill(PINK, (0, 0, GAME_WIDTH, HEIGHT))
-		screen.fill(BLACK, (GAME_WIDTH, 0, MENU_WIDTH, HEIGHT))
+		screen.fill(PINK, (0, 0, WIDTH, HEIGHT))
 
 		# Draw menu
-		font = pygame.font.Font("features/PixelOperator-Bold.ttf", 35)
-		menu_font = pygame.font.Font("features/PixelOperator-Bold.ttf", 28)
-		best_score_text = menu_font.render(f"Best Score: {best_score}", True, YELLOW)
-		score_text = menu_font.render(f"Score: {score}", True, WHITE)
-		menu_title = font.render("Menu", True, BLUE)
+		font = pygame.font.Font("features/PixelOperator-Bold.ttf", 24)
+		menu_font = pygame.font.Font("features/PixelOperator-Bold.ttf", 20)
+		best_score_text = menu_font.render(f"Best Score: {best_score}", True, DARK_PINK)
+		score_text = menu_font.render(f"Score: {score}", True, DARK_PINK)
 
 		# Display menu elements
-		screen.blit(menu_title, (GAME_WIDTH + 70, 20))  # Menu title
-		screen.blit(score_text, (GAME_WIDTH + 20, 80))  # Score text
-		screen.blit(best_score_text, (GAME_WIDTH + 20, 110))  # Score text
+		screen.blit(score_text, (5, 20))  # Score text
+		screen.blit(best_score_text, (5, 50))  # Score text
 
 		# Handle user input
 		keys = pygame.key.get_pressed()
@@ -162,9 +160,8 @@ def game_loop(screen, clock):
 				exit()
 
 		# Update platform positions
-		platforms = update_platforms(platforms, 0, GAME_WIDTH, HEIGHT)
+		platforms = update_platforms(platforms, 0, WIDTH, HEIGHT)
 
-    
 		# Generate new rewards
 		if random.random() < 0.005:
 			generate_rewards(platforms, rewards)

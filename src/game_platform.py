@@ -26,18 +26,17 @@ def create_initial_platform(screen_width, screen_height):
 	return Platform(x, y)
 
 # Function to generate initial platforms at the start of the game
-def generate_initial_platforms(num_platforms, screen_width, screen_height):
-	platforms = []
-	spacing = screen_height // num_platforms
+def generate_initial_platforms(platforms, num_platforms, screen_width, screen_height):
 
 	# Random horizontal and vertical position for each platform
 	for i in range(num_platforms):
 		valid_position = False
+		attempts = 0
 
-		while not valid_position:
+		while not valid_position and attempts < 100:
 			# Generate random coordinates for the platform
 			x = random.randint(0, screen_width - PLATFORM_WIDTH)
-			y = screen_height - (i + 1) * spacing
+			y = random.randint(screen_height // 4, screen_height - 100)
 
 			# Check the distance from other platforms
 			valid_position = True
@@ -47,9 +46,14 @@ def generate_initial_platforms(num_platforms, screen_width, screen_height):
 					valid_position = False
 					break
 
+			attempts += 1
+
 			# If valid, create the platform
 			if valid_position:
 				platforms.append(Platform(x, y))
+
+		if attempts >= 100:
+			break
 
 	return platforms
 
