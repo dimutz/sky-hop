@@ -28,7 +28,7 @@ class Reward:
 
 	def is_out_of_screen(self, screen_height):
 		# Check if reward is out of screen
-		return self.y + self.height > screen_height
+		return self.y + self.height >= screen_height
 
 def generate_rewards(platforms, num_rewards):
 	rewards = []

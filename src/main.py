@@ -108,7 +108,7 @@ def game_loop(screen, clock):
 
 	# Generate rewards
 	rewards = generate_rewards(platforms, 10)
-
+	score = 0
 	while running:
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
@@ -169,16 +169,11 @@ def game_loop(screen, clock):
 				score += 5  # Increase score
 
 
-		# Check for rewards collection
+		# Check for rewards out of screen
 		for reward in rewards[:]:
 			if reward.is_out_of_screen(HEIGHT):
 				rewards.remove(reward)
 
-		# Check for rewards collection
-		for reward in rewards[:]:
-			if reward.is_collected(character):
-				rewards.remove(reward)
-				score += 5  # Increase score
 
 		# Draw everything on the screen
 		for platform in platforms:
