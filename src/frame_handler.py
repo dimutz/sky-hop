@@ -47,3 +47,27 @@ def draw_landmarks_on_image(rgb_image: np.ndarray, results):
                         (0, rgb_image.shape[0] // 2), cv2.FONT_HERSHEY_TRIPLEX,
                         FONT_SIZE, BLACK_COLOR, FONT_THICKNESS, cv2.LINE_AA)
     return annotated_image
+
+
+def get_index_fingertip_position(rgb_image: np.ndarray, results):
+    if results.multi_hand_landmarks:
+        # Only tracking 1 hand at a time
+        hand_landmarks = results.multi_hand_landmarks[0]
+        # Get image dimensions
+        image_rows, image_cols, _ = rgb_image.shape
+        # Index tip landmark no. according to documentation
+        index_tip_landmark = hand_landmarks.landmark[8]
+        # Check for minimum visibility and presence
+        if ((index_tip_landmark.HasField('visibility') and
+             index_tip_landmark.visibility < 0.5) or
+                (index_tip_landmark.HasField('presence') and
+                 index_tip_landmark.presence < 0.5)):
+            return -1
+        # Check for normalized values
+        if (0 < index_tip_landmark.x < 1 and
+                0 < index_tip_landmark.y < 1):
+            # Get pixel coordinates
+            x_px = min(math.floor(index_tip_landmark.x * image_cols), image_cols - 1)
+            return x_px
+        return -1
+    return -1

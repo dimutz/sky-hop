@@ -1,9 +1,10 @@
 import cv2
 import mediapipe as mp
-from frame_handler import draw_landmarks_on_image
+from character import Character
+from frame_handler import draw_landmarks_on_image, get_index_fingertip_position
 
 
-def capture_video():
+def capture_video_demo():
     cap = cv2.VideoCapture(0)
     if not cap.isOpened():
         print("Cannot open camera")
@@ -37,8 +38,27 @@ def capture_video():
     cv2.destroyAllWindows()
 
 
+def capture_video(character: Character, cap, detector):
+    # Capture frame-by-frame
+    ret, frame = cap.read()
+    frame = cv2.flip(frame, 1)
+    # If frame is read correctly ret is True
+    if not ret:
+        print("Can't receive frame. Exiting ...")
+        return
+    # Convert frame to RGB format
+    rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    # Detect hand landmarks
+    results = detector.process(rgb_frame)
+    # Pass the detection results to the tracking function
+    if results.multi_hand_landmarks:
+        new_x = get_index_fingertip_position(rgb_frame, results)
+        if new_x != -1:
+            character.handle_motion(new_x)
+
+
 def main():
-    capture_video()
+    capture_video_demo()
 
 
 if __name__ == '__main__':
