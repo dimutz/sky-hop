@@ -31,6 +31,15 @@ class Character:
 		# Prevent the character from moving outside the screen's boundaries
 		self.x = max(0, min(self.x, self.screen_width - self.width))
 
+	def handle_motion(self, new_x):
+		if self.x > new_x:
+			self.x -= self.speed_x
+		if self.x < new_x:
+			self.x += self.speed_x
+
+		# Prevent the character from moving outside the screen's boundaries
+		self.x = max(0, min(self.x, self.screen_width - self.width))
+
 	def check_collision_with_platform(self, platforms):
 		for platform in platforms:
 			# Checks if the character collides with platforms when falling
@@ -51,10 +60,10 @@ class Character:
 			self.velocity_y = min(self.velocity_y, 5)
 
 		# If the character moves past a value, an automatic scroll downward is made
-		if self.y < screen_height // 3:
+		if self.y < screen_height // 4:
 			for platform in platforms:
 				platform.rect.y += abs(self.velocity_y) + scroll_speed
-			self.y = screen_height // 3
+			self.y = screen_height // 4
 
 		# If the character falls off, it's game over
 		if self.y + self.height >= screen_height:
