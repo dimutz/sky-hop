@@ -98,7 +98,7 @@ def game_over_screen(screen):
 
 
 # Main game loop: Handles game logic and updates
-def game_loop(screen, clock):
+def game_loop(screen, clock, use_video_input):
     running = True
     score = 0
     best_score = read_best_score()
@@ -151,11 +151,13 @@ def game_loop(screen, clock):
         screen.blit(best_score_text, (GAME_WIDTH + 20, 110))  # Score text
 
         # Handle user key input
-        keys = pygame.key.get_pressed()
-        character.handle_movement(keys)
+        if not use_video_input:
+            keys = pygame.key.get_pressed()
+            character.handle_movement(keys)
 
         # Handle user video input
-        capture_video(character, cap, detector)
+        if use_video_input:
+            capture_video(character, cap, detector)
 
         # Update character position and check game over status
         character_status = character.update(platforms, HEIGHT, 1)
@@ -230,10 +232,10 @@ def main():
             pygame.quit()
             exit()
         elif menu_action == "start":
-            game_loop(screen, clock)
+            game_loop(screen, clock, menu.use_video_input)
 
         # Run the game loop
-        game_loop(screen, clock)
+        game_loop(screen, clock, menu.use_video_input)
 
         # Quit the game
         pygame.quit()
