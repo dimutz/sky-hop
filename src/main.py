@@ -117,15 +117,16 @@ def game_loop(screen, clock, use_video_input):
     # Initialize reward list
     rewards = []
 
-    # Open camera
-    cap = cv2.VideoCapture(0)
-    if not cap.isOpened():
-        print("Cannot open camera")
-        exit()
-    # Create HandLandmarker detector
-    detector = mp.solutions.hands.Hands(max_num_hands=1,
-                                        min_detection_confidence=0.5,
-                                        min_tracking_confidence=0.5)
+    # Open camera if video input is enabled
+    if use_video_input:
+        cap = cv2.VideoCapture(0)
+        if not cap.isOpened():
+            print("Cannot open camera")
+            exit()
+        # Create HandLandmarker detector
+        detector = mp.solutions.hands.Hands(max_num_hands=1,
+                                            min_detection_confidence=0.5,
+                                            min_tracking_confidence=0.5)
 
     while running:
         for event in pygame.event.get():
@@ -173,7 +174,8 @@ def game_loop(screen, clock, use_video_input):
         if character_status == "game_over":
             running = False
             # Release video capture for the moment
-            cap.release()
+            if use_video_input:
+                cap.release()
             result = game_over_screen(screen)
             if result == "restart":
                 main()  # Restart the game

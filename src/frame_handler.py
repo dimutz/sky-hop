@@ -66,8 +66,7 @@ def get_index_fingertip_position(rgb_image: np.ndarray, results):
         # Check for normalized values
         if (0 < index_tip_landmark.x < 1 and
                 0 < index_tip_landmark.y < 1):
-            # Get pixel coordinates
-            x_px = min(math.floor(index_tip_landmark.x * image_cols), image_cols - 1)
-            return x_px
+            # Get normalised x coordinate
+            return index_tip_landmark.x
         return -1
     return -1

@@ -31,7 +31,8 @@ class Character:
 		# Prevent the character from moving outside the screen's boundaries
 		self.x = max(0, min(self.x, self.screen_width - self.width))
 
-	def handle_motion(self, new_x):
+	def handle_motion(self, norm_x):
+		new_x = norm_x * self.screen_width
 		if self.x > new_x:
 			self.x -= self.speed_x
 		if self.x < new_x:
