@@ -1,6 +1,7 @@
 import pygame
 
-chipmunk = "features/character.png"
+chipmunk = "features/chipmunk.png"
+
 class Character:
 	def __init__(self, screen_width, screen_height):
 		# Load the character image into the game window

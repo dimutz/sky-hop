@@ -6,8 +6,8 @@ from game_platform import generate_initial_platforms, update_platforms, create_i
 from character import Character  # Character class
 from game_menu import GameMenu
 from video_capture_processing import capture_video
-
 from reward import generate_rewards
+
 
 WIDTH, HEIGHT = 600, 600
 BUTTON_WIDTH, BUTTON_HEIGHT = 200, 50
@@ -17,226 +17,230 @@ BLUE = (0, 0, 255)
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 PINK = (234, 212, 252)
-DARK_PINK = (150, 80, 150)
+DARK_PINK = (180, 90, 180)
 GREEN = (152, 251, 152)
 FPS = 60
 
 
 def read_best_score():
-    try:
-        with open("features/best_score.txt", "r") as file:
-            return int(file.read().strip())
-    except (FileNotFoundError, ValueError):
-        return 0
+	try:
+		with open("features/best_score.txt", "r") as file:
+			return int(file.read().strip())
+	except (FileNotFoundError, ValueError):
+		return 0
 
 
 def save_best_score(score):
-    with open("features/best_score.txt", "w") as file:
-        file.write(str(score))
+	with open("features/best_score.txt", "w") as file:
+		file.write(str(score))
 
 
 # Game over screen: Displays a message when the game ends
 def game_over_screen(screen):
-    # Load font
-    font = pygame.font.Font("features/PixelOperator-Bold.ttf", 80)
-    button_font = pygame.font.Font("features/PixelOperator-Bold.ttf", 28)
+	# Load font
+	font = pygame.font.Font("features/PixelOperator-Bold.ttf", 80)
+	button_font = pygame.font.Font("features/PixelOperator-Bold.ttf", 28)
 
-    # Render buttons
-    restart_button = pygame.Rect(WIDTH // 2 - BUTTON_WIDTH // 2, HEIGHT // 2, BUTTON_WIDTH, BUTTON_HEIGHT)
-    quit_button = pygame.Rect(WIDTH // 2 - BUTTON_WIDTH // 2, HEIGHT // 2 + 70, BUTTON_WIDTH, BUTTON_HEIGHT)
+	# Render buttons
+	restart_button = pygame.Rect(WIDTH // 2 - BUTTON_WIDTH // 2, HEIGHT // 2, BUTTON_WIDTH, BUTTON_HEIGHT)
+	quit_button = pygame.Rect(WIDTH // 2 - BUTTON_WIDTH // 2, HEIGHT // 2 + 70, BUTTON_WIDTH, BUTTON_HEIGHT)
 
-    # Blinking variables
-    blink = True
-    blink_interval = 400
-    last_blink_time = pygame.time.get_ticks()
+	# Blinking variables
+	blink = True
+	blink_interval = 400
+	last_blink_time = pygame.time.get_ticks()
 
-    running = True
-    while running:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                exit()
+	running = True
+	while running:
+		for event in pygame.event.get():
+			if event.type == pygame.QUIT:
+				pygame.quit()
+				exit()
 
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                # Handle button clicks
-                if restart_button.collidepoint(event.pos):
-                    return "restart"
-                if quit_button.collidepoint(event.pos):
-                    return "quit"
+			if event.type == pygame.MOUSEBUTTONDOWN:
+				# Handle button clicks
+				if restart_button.collidepoint(event.pos):
+					return "restart"
+				if quit_button.collidepoint(event.pos):
+					return "quit"
 
-        # Get current time and toggle blinking
-        current_time = pygame.time.get_ticks()
-        if current_time - last_blink_time >= blink_interval:
-            blink = not blink
-            last_blink_time = current_time
+		# Get current time and toggle blinking
+		current_time = pygame.time.get_ticks()
+		if current_time - last_blink_time >= blink_interval:
+			blink = not blink
+			last_blink_time = current_time
 
-        # Clear screen
-        screen.fill(BLACK)
+		# Clear screen
+		screen.fill(BLACK)
 
-        # Blinking Game Over text
-        if blink:
-            text = font.render("GAME OVER", True, WHITE)  # Red text
-            text_rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 3))
-            screen.blit(text, text_rect)
+		# Blinking Game Over text
+		if blink:
+			text = font.render("GAME OVER", True, WHITE)  # Red text
+			text_rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 3))
+			screen.blit(text, text_rect)
 
-        # Draw buttons
-        pygame.draw.rect(screen, GREEN, restart_button)
-        pygame.draw.rect(screen, RED, quit_button)
+		# Draw buttons
+		pygame.draw.rect(screen, GREEN, restart_button)
+		pygame.draw.rect(screen, RED, quit_button)
 
-        # Render button text
-        restart_text = button_font.render("Restart", True, BLACK)
-        quit_text = button_font.render("Quit", True, BLACK)
-        screen.blit(restart_text, (restart_button.centerx - restart_text.get_width() // 2, restart_button.centery -
-                                   restart_text.get_height() // 2))
-        screen.blit(quit_text, (quit_button.centerx - quit_text.get_width() // 2, quit_button.centery -
-                                quit_text.get_height() // 2))
+		# Render button text
+		restart_text = button_font.render("Restart", True, BLACK)
+		quit_text = button_font.render("Quit", True, BLACK)
+		screen.blit(restart_text, (restart_button.centerx - restart_text.get_width() // 2, restart_button.centery -
+								   restart_text.get_height() // 2))
+		screen.blit(quit_text, (quit_button.centerx - quit_text.get_width() // 2, quit_button.centery -
+								quit_text.get_height() // 2))
 
-        # Update display
-        pygame.display.flip()
-        pygame.time.Clock().tick(FPS)
+		# Update display
+		pygame.display.flip()
+		pygame.time.Clock().tick(FPS)
 
 
 # Main game loop: Handles game logic and updates
 def game_loop(screen, clock, use_video_input):
-    running = True
-    score = 0
-    best_score = read_best_score()
+	running = True
+	score = 0
+	best_score = read_best_score()
 
-    # Create the initial platform
-    initial_platform = create_initial_platform(WIDTH, HEIGHT)
+	# Create the initial platform
+	initial_platform = create_initial_platform(WIDTH, HEIGHT)
+	platforms = [initial_platform]
 
-    # Create the character and position it on the initial platform
-    character = Character(WIDTH, HEIGHT)
-    character.y = initial_platform.rect.top - character.height
+	# Create the character and position it on the initial platform
+	character = Character(WIDTH, HEIGHT)
+	character.y = initial_platform.rect.top - character.height
 
-    # Generate additional platforms
-    platforms = generate_initial_platforms(5, WIDTH, HEIGHT)
-    platforms.append(initial_platform)
+	# Generate additional platforms
+	platforms = generate_initial_platforms(platforms, 5, WIDTH, HEIGHT)
 
-    # Initialize reward list
-    rewards = []
+	# Inițializarea listei de recompense
+	rewards = []
 
-    # Open camera
-    cap = cv2.VideoCapture(0)
-    if not cap.isOpened():
-        print("Cannot open camera")
-        exit()
-    # Create HandLandmarker detector
-    detector = mp.solutions.hands.Hands(max_num_hands=1,
-                                        min_detection_confidence=0.5,
-                                        min_tracking_confidence=0.5)
+	# Initialize reward list
+	rewards = []
 
-    while running:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-                pygame.quit()
-                exit()
+	# Open camera
+	cap = cv2.VideoCapture(0)
+	if not cap.isOpened():
+		print("Cannot open camera")
+		exit()
+	# Create HandLandmarker detector
+	detector = mp.solutions.hands.Hands(max_num_hands=1,
+										min_detection_confidence=0.5,
+										min_tracking_confidence=0.5)
 
-        # Clear the game screen
-        screen.fill(PINK, (0, 0, WIDTH, HEIGHT))
+	while running:
+		for event in pygame.event.get():
+			if event.type == pygame.QUIT:
+				running = False
+				pygame.quit()
+				exit()
 
-        # Draw menu
-        font = pygame.font.Font("features/PixelOperator-Bold.ttf", 35)
-        menu_font = pygame.font.Font("features/PixelOperator-Bold.ttf", 24)
-        best_score_text = menu_font.render(f"Best Score: {best_score}", True, DARK_PINK)
-        score_text = menu_font.render(f"Score: {score}", True, DARK_PINK)
 
-        # Display menu elements
-        screen.blit(score_text, (20, 40))  # Score text
-        screen.blit(best_score_text, (20, 70))  # Score text
+		# Clear the game screen
+		screen.fill(PINK, (0, 0, WIDTH, HEIGHT))
 
-        # Handle user key input
-        if not use_video_input:
-            keys = pygame.key.get_pressed()
-            character.handle_movement(keys)
+		# Draw menu
+		font = pygame.font.Font("features/PixelOperator-Bold.ttf", 24)
+		menu_font = pygame.font.Font("features/PixelOperator-Bold.ttf", 20)
+		best_score_text = menu_font.render(f"Best Score: {best_score}", True, DARK_PINK)
+		score_text = menu_font.render(f"Score: {score}", True, DARK_PINK)
 
-        # Handle user video input
-        if use_video_input:
-            capture_video(character, cap, detector)
+		# Display menu elements
+		screen.blit(score_text, (5, 20))  # Score text
+		screen.blit(best_score_text, (5, 50))  # Score text
 
-        # Update character position and check game over status
-        character_status = character.update(platforms, HEIGHT, 1)
+		# Handle user key input
+		if not use_video_input:
+			keys = pygame.key.get_pressed()
+			character.handle_movement(keys)
 
-        # Increase score when touching a platform
-        if character.check_collision_with_platform(platforms):
-            score += 1
+		# Handle user video input
+		if use_video_input:
+			capture_video(character, cap, detector)
 
-        if score > best_score:
-            save_best_score(score)
+		# Update character position and check game over status
+		character_status = character.update(platforms, HEIGHT, 1)
 
-        # Check game over status
-        if character_status == "game_over":
-            running = False
-            # Release video capture for the moment
-            cap.release()
-            result = game_over_screen(screen)
-            if result == "restart":
-                main()  # Restart the game
-            elif result == "quit":
-                pygame.quit()
-                exit()
+		# Increase score when touching a platform
+		if character.check_collision_with_platform(platforms):
+			score += 1
 
-        # Update platform positions
-        platforms = update_platforms(platforms, 0, WIDTH, HEIGHT)
+		if score > best_score:
+			save_best_score(score)
 
-        # Generate new rewards
-        if random.random() < 0.005:
-            generate_rewards(platforms, rewards, character)
+		# Check game over status
+		if character_status == "game_over":
+			running = False
+			# Release video capture for the moment
+			cap.release()
+			result = game_over_screen(screen)
+			if result == "restart":
+				main()  # Restart the game
+			elif result == "quit":
+				pygame.quit()
+				exit()
 
-        # Update rewards and remove those out of screen
-        for reward in rewards:
-            reward.update_position()
+		# Update platform positions
+		platforms = update_platforms(platforms, 0, WIDTH, HEIGHT)
 
-        # Check for rewards collection
-        for reward in rewards[:]:
-            if reward.is_collected(character):
-                rewards.remove(reward)
-                score += 5  # Increase score
+		# Generate new rewards
+		if random.random() < 0.005:
+			generate_rewards(platforms, rewards, character)
 
-        # Check for rewards out of screen
-        for reward in rewards[:]:
-            if reward.is_out_of_screen(HEIGHT):
-                rewards.remove(reward)
+		# Update rewards and remove those out of screen
+		for reward in rewards:
+			reward.update_position()
 
-        # Draw everything on the screen
-        for platform in platforms:
-            platform.draw(screen)
-        for reward in rewards:
-            reward.draw(screen)
-        character.draw(screen)
+		# Check for rewards collection
+		for reward in rewards[:]:
+			if reward.is_collected(character):
+				rewards.remove(reward)
+				score += 5  # Increase score
 
-        # Refresh the display
-        pygame.display.flip()
-        clock.tick(FPS)
+		# Check for rewards out of screen
+		for reward in rewards[:]:
+			if reward.is_out_of_screen(HEIGHT):
+				rewards.remove(reward)
+
+		# Draw everything on the screen
+		for platform in platforms:
+			platform.draw(screen)
+		for reward in rewards:
+			reward.draw(screen)
+		character.draw(screen)
+
+		# Refresh the display
+		pygame.display.flip()
+		clock.tick(FPS)
 
 
 # Main function: Initializes and starts the game
 def main():
-    pygame.init()
-    screen = pygame.display.set_mode((WIDTH, HEIGHT))
-    pygame.display.set_caption("Sky Hop")
-    clock = pygame.time.Clock()
+	pygame.init()
+	screen = pygame.display.set_mode((WIDTH, HEIGHT))
+	pygame.display.set_caption("Sky Hop")
+	clock = pygame.time.Clock()
 
-    font = pygame.font.Font("features/PixelOperator-Bold.ttf", 35)
-    menu = GameMenu(screen, font, WIDTH, HEIGHT)
+	font = pygame.font.Font("features/PixelOperator-Bold.ttf", 35)
+	menu = GameMenu(screen, font, WIDTH, HEIGHT)
 
-    while True:
-        menu_action = menu.main_menu()
+	while True:
+		menu_action = menu.main_menu()
 
-        if menu_action == "quit":
-            pygame.quit()
-            exit()
-        elif menu_action == "start":
-            game_loop(screen, clock, menu.use_video_input)
+		if menu_action == "quit":
+			pygame.quit()
+			exit()
+		elif menu_action == "start":
+			game_loop(screen, clock, menu.use_video_input)
 
-        # Run the game loop
-        game_loop(screen, clock, menu.use_video_input)
+		# Run the game loop
+		game_loop(screen, clock, menu.use_video_input)
 
-        # Quit the game
-        pygame.quit()
+		# Quit the game
+		pygame.quit()
 
 
 # Entry point of the script
 if __name__ == "__main__":
-    main()
+	main()
