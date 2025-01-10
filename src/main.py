@@ -98,120 +98,119 @@ def game_over_screen(screen):
 
 # Main game loop: Handles game logic and updates
 def game_loop(screen, clock, use_video_input):
-    running = True
-    score = 0
-    best_score = read_best_score()
+	running = True
+	score = 0
+	best_score = read_best_score()
 
-    # Create the initial platform
-	  initial_platform = create_initial_platform(WIDTH, HEIGHT)
- 	  platforms = [initial_platform]
+	# Create the initial platform
+	initial_platform = create_initial_platform(WIDTH, HEIGHT)
+	platforms = [initial_platform]
 
-	  # Create the character and position it on the initial platform
-  	character = Character(WIDTH, HEIGHT)
-  	character.y = initial_platform.rect.top - character.height
+	# Create the character and position it on the initial platform
+	character = Character(WIDTH, HEIGHT)
+	character.y = initial_platform.rect.top - character.height
 
-	  # Generate additional platforms
-  	platforms = generate_initial_platforms(platforms, 5, WIDTH, HEIGHT)
+	# Generate additional platforms
+	platforms = generate_initial_platforms(platforms, 5, WIDTH, HEIGHT)
 
-	  # Initialize reward list
-	  rewards = []
+	# Initialize reward list
+	rewards = []
 
-    # Open camera if video input is enabled
-    if use_video_input:
-        cap = cv2.VideoCapture(0)
-        if not cap.isOpened():
-            print("Cannot open camera")
-            exit()
-        # Create HandLandmarker detector
-        detector = mp.solutions.hands.Hands(max_num_hands=1,
-                                            min_detection_confidence=0.5,
-                                            min_tracking_confidence=0.5)
+	# Open camera if video input is enabled
+	if use_video_input:
+		cap = cv2.VideoCapture(0)
+		if not cap.isOpened():
+			print("Cannot open camera")
+			exit()
+		# Create HandLandmarker detector
+		detector = mp.solutions.hands.Hands(max_num_hands=1,
+											min_detection_confidence=0.5,
+											min_tracking_confidence=0.5)
 
-    while running:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-                pygame.quit()
-                exit()
+	while running:
+		for event in pygame.event.get():
+			if event.type == pygame.QUIT:
+				running = False
+				pygame.quit()
+				exit()
 
-        # Clear the game screen
-    		screen.fill(PINK, (0, 0, WIDTH, HEIGHT))
+		# Clear the game screen
+			screen.fill(PINK, (0, 0, WIDTH, HEIGHT))
 
-		    # Draw menu
-		    font = pygame.font.Font("features/PixelOperator-Bold.ttf", 24)
-		    menu_font = pygame.font.Font("features/PixelOperator-Bold.ttf", 20)
-		    best_score_text = menu_font.render(f"Best Score: {best_score}", True, DARK_PINK)
-		    score_text = menu_font.render(f"Score: {score}", True, DARK_PINK)
+			# Draw menu
+			font = pygame.font.Font("features/PixelOperator-Bold.ttf", 24)
+			menu_font = pygame.font.Font("features/PixelOperator-Bold.ttf", 20)
+			best_score_text = menu_font.render(f"Best Score: {best_score}", True, DARK_PINK)
+			score_text = menu_font.render(f"Score: {score}", True, DARK_PINK)
 
-		    # Display menu elements
-		    screen.blit(score_text, (5, 20))  # Score text
-		    screen.blit(best_score_text, (5, 50))  # Score text
-       
-        # Handle user key input
-        if not use_video_input:
-            keys = pygame.key.get_pressed()
-            character.handle_movement(keys)
+			# Display menu elements
+			screen.blit(score_text, (5, 20))  # Score text
+			screen.blit(best_score_text, (5, 50))  # Score text
 
-        # Handle user video input
-        if use_video_input:
-            capture_video(character, cap, detector)
+		# Handle user key input
+		if not use_video_input:
+			keys = pygame.key.get_pressed()
+			character.handle_movement(keys)
 
-        # Update character position and check game over status
-        character_status = character.update(platforms, HEIGHT, 1)
+		# Handle user video input
+		if use_video_input:
+			capture_video(character, cap, detector)
 
-        # Increase score when touching a platform
-        if character.check_collision_with_platform(platforms):
-            score += 1
+		# Update character position and check game over status
+		character_status = character.update(platforms, HEIGHT, 1)
 
-        if score > best_score:
-            save_best_score(score)
+		# Increase score when touching a platform
+		if character.check_collision_with_platform(platforms):
+			score += 1
 
-        # Check game over status
-        if character_status == "game_over":
-            running = False
-            # Release video capture for the moment
-            if use_video_input:
-                cap.release()
-            result = game_over_screen(screen)
-            if result == "restart":
-                main()  # Restart the game
-            elif result == "quit":
-                pygame.quit()
-                exit()
+		if score > best_score:
+			save_best_score(score)
 
-        # Update platform positions
-        platforms = update_platforms(platforms, 0, WIDTH, HEIGHT)
-        
-        if random.random() < 0.005:
-			      generate_rewards(platforms, rewards, character)
+		# Check game over status
+		if character_status == "game_over":
+			running = False
+			# Release video capture for the moment
+			if use_video_input:
+				cap.release()
+			result = game_over_screen(screen)
+			if result == "restart":
+				main()  # Restart the game
+			elif result == "quit":
+				pygame.quit()
+				exit()
 
-		    # Update rewards and remove those out of screen
-		    for reward in rewards:
-			      reward.update_position()
+		# Update platform positions
+		platforms = update_platforms(platforms, 0, WIDTH, HEIGHT)
 
-		    # Check for rewards collection
-		    for reward in rewards[:]:
-			      if reward.is_collected(character):
-				        rewards.remove(reward)
-				        # Increase score
-                score += 5
+		if random.random() < 0.005:
+			generate_rewards(platforms, rewards, character)
 
-		    # Check for rewards out of screen
-		    for reward in rewards[:]:
-			      if reward.is_out_of_screen(HEIGHT):
-				        rewards.remove(reward)
 
-        # Draw everything on the screen
-        for platform in platforms:
-            platform.draw(screen)
-        for reward in rewards:
-            reward.draw(screen)
-        character.draw(screen)
+		for reward in rewards:
+			reward.update_position()
 
-        # Refresh the display
-        pygame.display.flip()
-        clock.tick(FPS)
+		# Check for rewards collection
+		for reward in rewards[:]:
+			if reward.is_collected(character):
+				rewards.remove(reward)
+				# Increase score
+				score += 5
 
+			# Check for rewards out of screen
+			for reward in rewards[:]:
+				if reward.is_out_of_screen(HEIGHT):
+					rewards.remove(reward)
+
+		# Draw everything on the screen
+		for platform in platforms:
+			platform.draw(screen)
+		for reward in rewards:
+			reward.draw(screen)
+		character.draw(screen)
+
+		# Refresh the display
+		pygame.display.flip()
+		clock.tick(FPS)
 
 
 # Main function: Initializes and starts the game
