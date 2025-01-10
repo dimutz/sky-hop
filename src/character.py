@@ -1,10 +1,10 @@
 import pygame
 
-
+chipmunk = "features/character.png"
 class Character:
 	def __init__(self, screen_width, screen_height):
 		# Load the character image into the game window
-		self.image = pygame.image.load("features/character.png")
+		self.image = pygame.image.load(chipmunk)
 
 		# Smoothly scale the image to the desired dimensions
 		self.image = pygame.transform.smoothscale(self.image, (100, 100))

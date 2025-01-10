@@ -2,11 +2,11 @@ import pygame
 import random
 
 height = 500
-
+reward = "features/reward1.png"
 
 class Reward:
     def __init__(self, platform):
-        self.image = pygame.image.load("features/reward1.png")
+        self.image = pygame.image.load(reward)
         self.image = pygame.transform.smoothscale(self.image, (50, 50))
         self.width, self.height = self.image.get_size()
         self.platform = platform
@@ -33,13 +33,18 @@ class Reward:
         return self.y + self.height >= screen_height
 
 
-def generate_rewards(platforms, rewards, min_distance=200, max_attempts=5):
+def generate_rewards(platforms, rewards, character, min_distance=200, max_attempts=5):
     for platform in platforms:
         valid_position = False
         attempts = 0
         while not valid_position and attempts < max_attempts:
             x = platform.rect.x + random.randint(0, platform.rect.width - 50)
             y = platform.rect.y - 50  # Reward's vertical position
+
+            # Check if reward is too low compared to the character's position
+            if y > character.y + character.height:
+                valid_position = False
+                break
 
             # Check distance between rewards
             valid_position = True
