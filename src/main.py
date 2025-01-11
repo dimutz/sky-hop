@@ -36,16 +36,16 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Sky Hop")
 
 def read_best_score():
-    try:
-        with open("features/best_score.txt", "r") as file:
-            return int(file.read().strip())
-    except (FileNotFoundError, ValueError):
-        return 0
+	try:
+		with open("features/best_score.txt", "r") as file:
+			return int(file.read().strip())
+	except (FileNotFoundError, ValueError):
+		return 0
 
 
 def save_best_score(score):
-    with open("features/best_score.txt", "w") as file:
-        file.write(str(score))
+	with open("features/best_score.txt", "w") as file:
+		file.write(str(score))
 
 
 # Game over screen: Displays a message when the game ends
@@ -266,7 +266,6 @@ def game_loop(screen, clock, use_video_input, background_image):
         pygame.display.flip()
         clock.tick(FPS)
 
-
 # Main function: Initializes and starts the game
 def main():
     clock = pygame.time.Clock()
@@ -278,9 +277,8 @@ def main():
     font = pygame.font.Font("features/PixelOperator-Bold.ttf", 35)
     menu = GameMenu(screen, font, WIDTH, HEIGHT)
 
-    while True:
-        menu_action = menu.main_menu()
-
+	while True:
+		menu_action = menu.main_menu()
         if menu_action == "quit":
             pygame.quit()
             exit()
@@ -290,10 +288,10 @@ def main():
         # Run the game loop
         game_loop(screen, clock, menu.use_video_input, background_image)
 
-        # Quit the game
-        pygame.quit()
+		# Quit the game
+		pygame.quit()
 
 
 # Entry point of the script
 if __name__ == "__main__":
-    main()
+	main()
