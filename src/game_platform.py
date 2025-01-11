@@ -3,7 +3,7 @@ import random
 
 PLATFORM_WIDTH = 60
 PLATFORM_HEIGHT = 10
-MIN_VERTICAL_SPACING = 60  # Minimum vertical distance between platforms
+MIN_VERTICAL_SPACING = 40  # Minimum vertical distance between platforms
 MIN_HORIZONTAL_SPACING = 60  # Minimum horizontal distance between platforms
 BROWN = (139, 69, 19)
 
@@ -14,10 +14,19 @@ class Platform:
 		self.image = pygame.Surface((PLATFORM_WIDTH, PLATFORM_HEIGHT))
 		self.image.fill(BROWN)
 		self.rect = self.image.get_rect(topleft=(x, y))
+		self.is_jumped_on = False
 
 	# Draw the platform as a rectangle
 	def draw(self, screen):
 		screen.blit(self.image, self.rect)
+
+	def jumped_on_platform(self):
+		# Marchează platforma ca sărită
+		self.is_jumped_on = True
+
+	def reset(self):
+		# Resetează platforma pentru a putea fi sărită din nou (pentru o posibilă logică de resetare)
+		self.is_jumped_on = False
 
 # Function to create an initial platform at the bottom center of the screen
 def create_initial_platform(screen_width, screen_height):
@@ -70,7 +79,7 @@ def update_platforms(platforms, scroll_speed, screen_width, screen_height):
 	while len(platforms) < 6:
 		valid_position = False
 		attempts = 0
-		max_attempts = 100  # Limit attempts to prevent infinite loops
+		max_attempts = 200  # Limit attempts to prevent infinite loops
 
 		while not valid_position and attempts < max_attempts:
 			x = random.randint(0, screen_width - PLATFORM_WIDTH)
