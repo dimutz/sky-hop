@@ -1,6 +1,7 @@
 import pygame
 import sys
 import textwrap
+import os
 
 # Used colors in the game menu implementation
 PASTEL_GREEN = (107, 125, 125)
@@ -10,6 +11,9 @@ BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 DUSTY_ROSE = (134, 84, 103)
 
+os.environ['SDL_VIDEO_CENTERED'] = '1'
+
+pygame.init()
 
 class GameMenu:
     # Initialize the game menu screen
@@ -40,6 +44,7 @@ class GameMenu:
 
     # Creates the buttons and the game menu logic
     def draw_button(self, text, x, y, width, height, inactive_color, active_color, action=None):
+        # Takes the position of the mouse and checks if the click is pressed
         mouse = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()
 
@@ -101,7 +106,8 @@ class GameMenu:
                 "the space captured by the camera!",
                 "3. Avoid falling off the platforms!:)",
                 "4. Collect special items to increase your score!",
-                "5. Press B to go back to the menu!"
+                "",
+                "Press B to go back to the menu"
             ]
 
             wrapped_instructions = []

@@ -10,14 +10,14 @@ from reward import generate_rewards
 
 WIDTH, HEIGHT = 600, 600
 BUTTON_WIDTH, BUTTON_HEIGHT = 200, 50
-RED = (255, 182, 193)
-YELLOW = (255, 255, 0)
-BLUE = (0, 0, 255)
+RED = (255, 123, 108)
+DARK_RED = (234, 60, 83)
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 PINK = (234, 212, 252)
 DARK_PINK = (180, 90, 180)
 GREEN = (152, 251, 152)
+DARK_GREEN = (76, 154, 42)
 FPS = 60
 
 
@@ -51,6 +51,10 @@ def game_over_screen(screen):
 
     running = True
     while running:
+        # Takes the position of the mouse and checks if the click is pressed
+        mouse = pygame.mouse.get_pos()
+        click = pygame.mouse.get_pressed()
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -81,6 +85,27 @@ def game_over_screen(screen):
         # Draw buttons
         pygame.draw.rect(screen, GREEN, restart_button)
         pygame.draw.rect(screen, RED, quit_button)
+
+        # Checks if the mouse hovers over the button and if so, makes it darker to mark that it
+        # can be selected, otherwise, the button stays in its initial color
+        if restart_button.collidepoint(mouse):
+            pygame.draw.rect(screen, DARK_GREEN, restart_button)
+            
+            if click[0] == 1:
+                return "restart"
+        else:
+            pygame.draw.rect(screen, GREEN, restart_button)
+        
+        # Checks if the mouse hovers over the button and if so, makes it darker to mark that it
+        # can be selected, otherwise, the button stays in its initial color
+        if quit_button.collidepoint(mouse):
+            pygame.draw.rect(screen, DARK_RED, quit_button)
+
+            if click[0] == 1:
+                return "quit"
+        else:
+            pygame.draw.rect(screen, RED, quit_button)
+
 
         # Render button text
         restart_text = button_font.render("Restart", True, BLACK)
@@ -135,16 +160,6 @@ def game_loop(screen, clock, use_video_input):
 
         # Clear the game screen
         screen.fill(PINK, (0, 0, WIDTH, HEIGHT))
-
-        # Draw menu
-        font = pygame.font.Font("features/PixelOperator-Bold.ttf", 24)
-        menu_font = pygame.font.Font("features/PixelOperator-Bold.ttf", 20)
-        best_score_text = menu_font.render(f"Best Score: {best_score}", True, DARK_PINK)
-        score_text = menu_font.render(f"Score: {score}", True, DARK_PINK)
-
-        # Display menu elements
-        screen.blit(score_text, (5, 20))  # Score text
-        screen.blit(best_score_text, (5, 50))  # Score text
 
         # Handle user key input
         if not use_video_input:
@@ -206,6 +221,15 @@ def game_loop(screen, clock, use_video_input):
         for reward in rewards:
             reward.draw(screen)
         character.draw(screen)
+
+        # Draw score menu
+        menu_font = pygame.font.Font("features/PixelOperator-Bold.ttf", 35)
+        best_score_text = menu_font.render(f"Best Score: {best_score}", True, WHITE)
+        score_text = menu_font.render(f"Score: {score}", True, WHITE)
+
+        # Display menu elements
+        screen.blit(score_text, (5, 20))  # Score text
+        screen.blit(best_score_text, (5, 50))  # Best score text
 
         # Refresh the display
         pygame.display.flip()
