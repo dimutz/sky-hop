@@ -3,7 +3,7 @@ import mediapipe as mp
 import pygame
 import random
 from game_platform import generate_initial_platforms, update_platforms, create_initial_platform
-from character import Character
+from character import Character  # Character class
 from game_menu import GameMenu
 from video_capture_processing import capture_video
 from reward import generate_rewards
@@ -115,9 +115,6 @@ def game_loop(screen, clock, use_video_input):
 	# Initialize reward list
 	rewards = []
 
-	# List to track the platforms the character has already jumped on
-	jumped_on_platforms = set()
-
 	# Open camera if video input is enabled
 	if use_video_input:
 		cap = cv2.VideoCapture(0)
@@ -162,11 +159,8 @@ def game_loop(screen, clock, use_video_input):
 		character_status = character.update(platforms, HEIGHT, 1)
 
 		# Increase score when touching a platform
-		for platform in platforms:
-			if character.check_collision_with_platform([platform]):
-				if not platform.is_jumped_on:
-					score += 1
-					platform.jumped_on_platform()  # Mark this platform as jumped on
+		if character.check_collision_with_platform(platforms):
+			score += 1
 
 		if score > best_score:
 			save_best_score(score)
