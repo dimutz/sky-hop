@@ -2,6 +2,8 @@ import cv2
 import mediapipe as mp
 import pygame
 import random
+import os
+
 from game_platform import generate_initial_platforms, update_platforms, create_initial_platform
 from character import Character
 from game_menu import GameMenu
@@ -9,6 +11,7 @@ from video_capture_processing import capture_video
 from reward import generate_rewards
 
 level_1 = "features/first_background.jpg"
+level_2 = "features/second_background.jpg"
 
 WIDTH, HEIGHT = 600, 600
 BUTTON_WIDTH, BUTTON_HEIGHT = 200, 50
@@ -20,8 +23,17 @@ PINK = (234, 212, 252)
 DARK_PINK = (180, 90, 180)
 GREEN = (152, 251, 152)
 DARK_GREEN = (76, 154, 42)
+BLUE = (82, 178, 191)
+DARK_BLUE = (40, 80, 194)
+
 FPS = 60
 
+# Centers the window on the screen
+os.environ['SDL_VIDEO_CENTERED'] = '1'
+
+pygame.init()
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Sky Hop")
 
 def read_best_score():
     try:
@@ -45,6 +57,7 @@ def game_over_screen(screen):
     # Render buttons
     restart_button = pygame.Rect(WIDTH // 2 - BUTTON_WIDTH // 2, HEIGHT // 2, BUTTON_WIDTH, BUTTON_HEIGHT)
     quit_button = pygame.Rect(WIDTH // 2 - BUTTON_WIDTH // 2, HEIGHT // 2 + 70, BUTTON_WIDTH, BUTTON_HEIGHT)
+    back_to_menu_button = pygame.Rect(WIDTH // 2 - BUTTON_WIDTH // 2, HEIGHT // 2 + 210, BUTTON_WIDTH, BUTTON_HEIGHT)
 
     # Blinking variables
     blink = True
@@ -68,6 +81,8 @@ def game_over_screen(screen):
                     return "restart"
                 if quit_button.collidepoint(event.pos):
                     return "quit"
+                if back_to_menu_button.collidepoint(event.pos):
+                    return "back to menu"
 
         # Get current time and toggle blinking
         current_time = pygame.time.get_ticks()
@@ -87,6 +102,7 @@ def game_over_screen(screen):
         # Draw buttons
         pygame.draw.rect(screen, GREEN, restart_button)
         pygame.draw.rect(screen, RED, quit_button)
+        pygame.draw.rect(screen, BLUE, back_to_menu_button)
 
         # Checks if the mouse hovers over the button and if so, makes it darker to mark that it
         # can be selected, otherwise, the button stays in its initial color
@@ -98,8 +114,6 @@ def game_over_screen(screen):
         else:
             pygame.draw.rect(screen, GREEN, restart_button)
         
-        # Checks if the mouse hovers over the button and if so, makes it darker to mark that it
-        # can be selected, otherwise, the button stays in its initial color
         if quit_button.collidepoint(mouse):
             pygame.draw.rect(screen, DARK_RED, quit_button)
 
@@ -108,14 +122,24 @@ def game_over_screen(screen):
         else:
             pygame.draw.rect(screen, RED, quit_button)
 
+        if back_to_menu_button.collidepoint(mouse):
+            pygame.draw.rect(screen, DARK_BLUE, back_to_menu_button)
+
+            if click[0] == 1:
+                return "back to menu"
+        else:
+            pygame.draw.rect(screen, BLUE, back_to_menu_button)
 
         # Render button text
         restart_text = button_font.render("Restart", True, BLACK)
         quit_text = button_font.render("Quit", True, BLACK)
-        screen.blit(restart_text, (restart_button.centerx - restart_text.get_width() // 2, restart_button.centery -
-                                   restart_text.get_height() // 2))
-        screen.blit(quit_text, (quit_button.centerx - quit_text.get_width() // 2, quit_button.centery -
-                                quit_text.get_height() // 2))
+        back_to_menu_text = button_font.render("Back to Menu", True, BLACK)
+        screen.blit(restart_text, (restart_button.centerx - restart_text.get_width() // 2, 
+                                   restart_button.centery - restart_text.get_height() // 2))
+        screen.blit(quit_text, (quit_button.centerx - quit_text.get_width() // 2,
+                                quit_button.centery - quit_text.get_height() // 2))
+        screen.blit(back_to_menu_text, (back_to_menu_button.centerx - back_to_menu_text.get_width() // 2, 
+                                        back_to_menu_button.centery - back_to_menu_text.get_height() // 2))
 
         # Update display
         pygame.display.flip()
@@ -196,6 +220,9 @@ def game_loop(screen, clock, use_video_input, background_image):
             elif result == "quit":
                 pygame.quit()
                 exit()
+            elif result == "back to menu":
+                pygame.event.clear()
+                main()
 
         # Update platform positions
         platforms = update_platforms(platforms, 0, WIDTH, HEIGHT)
@@ -242,9 +269,6 @@ def game_loop(screen, clock, use_video_input, background_image):
 
 # Main function: Initializes and starts the game
 def main():
-    pygame.init()
-    screen = pygame.display.set_mode((WIDTH, HEIGHT))
-    pygame.display.set_caption("Sky Hop")
     clock = pygame.time.Clock()
 
     # Adds a background image

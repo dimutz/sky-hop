@@ -16,6 +16,7 @@ WHITE = (255, 255, 255)
 DUSTY_ROSE = (134, 84, 103)
 HUNTER_GREEN = (53, 94, 59)
 
+# Centers the window on the screen
 os.environ['SDL_VIDEO_CENTERED'] = '1'
 
 pygame.init()
@@ -256,6 +257,7 @@ class GameMenu:
             if toggle_action:
                 self.toggle_video_input()
             if quit_action:
+                pygame.event.clear()
                 return quit_action
 
             pygame.display.update()
