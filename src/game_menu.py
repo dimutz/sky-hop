@@ -21,12 +21,14 @@ os.environ['SDL_VIDEO_CENTERED'] = '1'
 
 pygame.init()
 
+
 def read_best_score():
     try:
         with open("features/best_score.txt", "r") as file:
             return int(file.read().strip())
     except (FileNotFoundError, ValueError):
         return 0
+
 
 class GameMenu:
     # Initialize the game menu screen
@@ -54,7 +56,7 @@ class GameMenu:
             self.screen.blit(glow_surface, (text_rect.x + offset, text_rect.y + offset))
 
         self.screen.blit(text_surface, text_rect)
-    
+
     # Draw rotated text with different color margin (glowing effect)
     def draw_rotated_text(self, text, x, y, angle, font, color, glow_color):
         # Creates the main text surface, in the desired color and marks the position where the text starts
@@ -104,7 +106,7 @@ class GameMenu:
         else:
             pygame.draw.rect(self.screen, inactive_color, (x, y, width, height))
 
-        # Adds text to the buttons and alligns it in the button's space
+        # Adds text to the buttons and aligns it in the button's space
         text_surface = self.font.render(text, True, BLACK)
         text_rect = text_surface.get_rect(center=(x + width // 2, y + height // 2))
         self.screen.blit(text_surface, text_rect)
@@ -150,7 +152,8 @@ class GameMenu:
             self.screen.blit(rotated_reward_sticker_right, rotated_reward_rect.topleft)
 
             # Adds the reward sticker on the screen
-            rotated_reward_rect = rotated_reward_sticker_left.get_rect(bottomleft=(self.width // 2 - 250, self.height - 45))
+            rotated_reward_rect = rotated_reward_sticker_left.get_rect(
+                bottomleft=(self.width // 2 - 250, self.height - 45))
             self.screen.blit(rotated_reward_sticker_left, rotated_reward_rect.topleft)
 
             # Makes a smaller font for the instructions
@@ -223,7 +226,8 @@ class GameMenu:
             # Creates a message (only for design purposes)
             highscore_font = pygame.font.Font("features/ARCADECLASSIC.TTF", 30)
             self.draw_rotated_text("High Score", self.width // 2 + 120, 25, -20, highscore_font, WHITE, HUNTER_GREEN)
-            self.draw_rotated_text(f"{formatted_highscore}", self.width // 2 + 140, 55, -20, highscore_font, WHITE, HUNTER_GREEN)
+            self.draw_rotated_text(f"{formatted_highscore}", self.width // 2 + 140, 55, -20, highscore_font, WHITE,
+                                   HUNTER_GREEN)
 
             # Adds the character sticker on the screen
             rotated_character_rect = rotated_character_sticker.get_rect(center=(self.width // 2 - 220, 180))
