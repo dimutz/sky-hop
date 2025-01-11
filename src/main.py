@@ -3,10 +3,12 @@ import mediapipe as mp
 import pygame
 import random
 from game_platform import generate_initial_platforms, update_platforms, create_initial_platform
-from character import Character  # Character class
+from character import Character
 from game_menu import GameMenu
 from video_capture_processing import capture_video
 from reward import generate_rewards
+
+level_1 = "features/first_background.jpg"
 
 WIDTH, HEIGHT = 600, 600
 BUTTON_WIDTH, BUTTON_HEIGHT = 200, 50
@@ -121,7 +123,7 @@ def game_over_screen(screen):
 
 
 # Main game loop: Handles game logic and updates
-def game_loop(screen, clock, use_video_input):
+def game_loop(screen, clock, use_video_input, background_image):
     running = True
     score = 0
     best_score = read_best_score()
@@ -159,7 +161,8 @@ def game_loop(screen, clock, use_video_input):
                 exit()
 
         # Clear the game screen
-        screen.fill(PINK, (0, 0, WIDTH, HEIGHT))
+        #screen.fill(PINK, (0, 0, WIDTH, HEIGHT))
+        screen.blit(background_image, (0, 0))
 
         # Handle user key input
         if not use_video_input:
@@ -188,7 +191,8 @@ def game_loop(screen, clock, use_video_input):
                 cap.release()
             result = game_over_screen(screen)
             if result == "restart":
-                main()  # Restart the game
+                pygame.event.clear() 
+                game_loop(screen, clock, use_video_input, background_image)  # Restart the game
             elif result == "quit":
                 pygame.quit()
                 exit()
@@ -222,14 +226,14 @@ def game_loop(screen, clock, use_video_input):
             reward.draw(screen)
         character.draw(screen)
 
-        # Draw score menu
+        # Draw score
         menu_font = pygame.font.Font("features/PixelOperator-Bold.ttf", 35)
         best_score_text = menu_font.render(f"Best Score: {best_score}", True, WHITE)
         score_text = menu_font.render(f"Score: {score}", True, WHITE)
 
         # Display menu elements
         screen.blit(score_text, (5, 20))  # Score text
-        screen.blit(best_score_text, (5, 50))  # Best score text
+        screen.blit(best_score_text, (5, 50))  # Score text
 
         # Refresh the display
         pygame.display.flip()
@@ -243,6 +247,10 @@ def main():
     pygame.display.set_caption("Sky Hop")
     clock = pygame.time.Clock()
 
+    # Adds a background image
+    background_image = pygame.image.load(level_1)
+    background_image = pygame.transform.scale(background_image, (WIDTH, HEIGHT))
+
     font = pygame.font.Font("features/PixelOperator-Bold.ttf", 35)
     menu = GameMenu(screen, font, WIDTH, HEIGHT)
 
@@ -253,10 +261,10 @@ def main():
             pygame.quit()
             exit()
         elif menu_action == "start":
-            game_loop(screen, clock, menu.use_video_input)
+            game_loop(screen, clock, menu.use_video_input, background_image)
 
         # Run the game loop
-        game_loop(screen, clock, menu.use_video_input)
+        game_loop(screen, clock, menu.use_video_input, background_image)
 
         # Quit the game
         pygame.quit()
